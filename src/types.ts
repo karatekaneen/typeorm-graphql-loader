@@ -249,7 +249,9 @@ export type RequireOrIgnoreSettings = Map<
   boolean | FieldConfigurationPredicate | undefined
 >;
 
-export type EjectQueryCallback<T> = <T>(
+export type EjectQueryCallback<T extends ObjectLiteral> = <
+  T extends ObjectLiteral
+>(
   qb: SelectQueryBuilder<T>
 ) => SelectQueryBuilder<T>;
 
