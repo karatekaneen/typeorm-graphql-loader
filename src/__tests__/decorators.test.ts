@@ -8,7 +8,7 @@ const { expect } = chai;
 
 describe("ConfigureLoader", () => {
   let helpers: TestHelpers;
-  let dt: DecoratorTest | undefined;
+  let dt: DecoratorTest | null;
 
   before(async () => {
     helpers = await startup("configure_loader", { logging: false });
@@ -382,7 +382,7 @@ describe("ConfigureLoader", () => {
   describe("user defined join alias", () => {
     it("can successfully query on a user defined alias", async () => {
       const { schema, loader, connection } = helpers;
-      const relation = await connection.getRepository(Author).findOne();
+      const relation = await connection.getRepository(Author).findOne({});
       const entity = await connection
         .getRepository(DecoratorTest)
         .createQueryBuilder("dt")

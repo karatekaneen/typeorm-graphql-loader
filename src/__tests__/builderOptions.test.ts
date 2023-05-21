@@ -15,7 +15,7 @@ describe("Query Builder options", () => {
 
   it("caches the same query to prevent duplicate calls", async () => {
     const { loader, connection, schema } = helpers;
-    const author = await connection.getRepository(Author).findOne();
+    const author = await connection.getRepository(Author).findOne({});
     const query = `
       query authorById($id: Int!) {
         first: authorById(id: $id) {
@@ -109,8 +109,8 @@ describe("Query Builder options", () => {
        }
      }
     `;
-    const author = await connection.getRepository(Author).findOne();
-    const publisher = await connection.getRepository(Publisher).findOne();
+    const author = await connection.getRepository(Author).findOne({});
+    const publisher = await connection.getRepository(Publisher).findOne({});
     const books = await connection
       .getRepository(Book)
       .createQueryBuilder("book")
@@ -138,8 +138,8 @@ describe("Query Builder options", () => {
        }
      }
     `;
-    const author = await connection.getRepository(Author).findOne();
-    const publisher = await connection.getRepository(Publisher).findOne();
+    const author = await connection.getRepository(Author).findOne({});
+    const publisher = await connection.getRepository(Publisher).findOne({});
     const books = await connection
       .getRepository(Book)
       .createQueryBuilder("book")
@@ -169,7 +169,7 @@ describe("Depth limiting", () => {
 
   it("does not load relations more than max depth", async () => {
     const { loader, connection, schema } = helpers;
-    const author = await connection.getRepository(Author).findOne();
+    const author = await connection.getRepository(Author).findOne({});
     const query = `
       query authorById($id: Int!) {
         authorById(id: $id) {

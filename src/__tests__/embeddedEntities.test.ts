@@ -17,7 +17,7 @@ describe("Querying embedded entities", () => {
 
   it("can query embedded fields on an entity", async () => {
     const { connection, schema, loader } = helpers;
-    const author = await connection.getRepository(Author).findOne();
+    const author = await connection.getRepository(Author).findOne({});
 
     const query = `
       query authorById($id: Int!) {

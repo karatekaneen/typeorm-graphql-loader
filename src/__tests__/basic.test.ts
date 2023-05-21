@@ -18,7 +18,7 @@ describe("Basic GraphQL queries", () => {
   describe("querying a single entity", () => {
     it("can query a single entity one layer deep", async () => {
       const { connection, schema, loader } = helpers;
-      const author = await connection.getRepository(Author).findOne();
+      const author = await connection.getRepository(Author).findOne({});
       const query = `
         query authorById($id: Int!) {
           authorById(id: $id) {
@@ -53,7 +53,7 @@ describe("Basic GraphQL queries", () => {
 
     it("can query fields that have custom column names", async () => {
       const { connection, schema, loader } = helpers;
-      const author = await connection.getRepository(Author).findOne();
+      const author = await connection.getRepository(Author).findOne({});
       const query = `
         query authorById($id: Int!) {
           authorById(id: $id) {
@@ -237,8 +237,8 @@ describe("Basic GraphQL queries", () => {
     it("can resolve a mutation that contains multiple return types (union)", async () => {
       const { connection, schema, loader } = helpers;
       const bookCount = await connection.getRepository(Book).count();
-      const author = await connection.getRepository(Author).findOne();
-      const publisher = await connection.getRepository(Publisher).findOne();
+      const author = await connection.getRepository(Author).findOne({});
+      const publisher = await connection.getRepository(Publisher).findOne({});
 
       const query = `
         fragment bookFragment on Book {
@@ -306,8 +306,8 @@ describe("Basic GraphQL queries", () => {
     it("can resolve a mutation that contains multiple return types (union) and nested fragments", async () => {
       const { connection, schema, loader } = helpers;
       const bookCount = await connection.getRepository(Book).count();
-      const author = await connection.getRepository(Author).findOne();
-      const publisher = await connection.getRepository(Publisher).findOne();
+      const author = await connection.getRepository(Author).findOne({});
+      const publisher = await connection.getRepository(Publisher).findOne({});
 
       const query = `
         fragment bookFragment on Book {
@@ -396,9 +396,9 @@ describe("Basic GraphQL queries", () => {
       const vars = { authorId: 1 };
       const result = await graphql(schema, query, {}, { loader }, vars);
 
-      const expected: Array<Partial<
-        Book
-      >> = books.map(({ id, title, summary }) => ({ id, title, summary }));
+      const expected: Array<Partial<Book>> = books.map(
+        ({ id, title, summary }) => ({ id, title, summary })
+      );
 
       expect(result).to.not.have.key("errors");
       expect(result.data!.booksByAuthorId).to.deep.equal(expected);

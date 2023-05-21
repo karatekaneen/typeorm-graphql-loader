@@ -45,6 +45,7 @@ export interface LoaderOptions {
    * Defaults to Infinity
    */
   maxQueryDepth?: number;
+  disableCache?: boolean;
 }
 
 export interface SearchOptions {

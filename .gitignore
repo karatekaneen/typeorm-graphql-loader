@@ -13,3 +13,4 @@ public/
 testSchema.graphql
 .run/
 *.tgz
+.npmrc

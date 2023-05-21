@@ -32,12 +32,14 @@ export class GraphQLQueryManager {
   private readonly _defaultLoaderSearchMethod: LoaderSearchMethod;
   private _resolver: GraphQLQueryResolver;
   private _formatter: Formatter;
+  private readonly _cacheEnabled: boolean;
 
   constructor(private _connection: Connection, options: LoaderOptions = {}) {
-    const { defaultSearchMethod } = options;
+    const { defaultSearchMethod, disableCache } = options;
     this._defaultLoaderSearchMethod =
       defaultSearchMethod ?? LoaderSearchMethod.ANY_POSITION;
 
+    this._cacheEnabled = !disableCache;
     this._resolver = new GraphQLQueryResolver(options);
     this._formatter = new Formatter(
       options.namingStrategy ?? LoaderNamingStrategyEnum.CAMELCASE
@@ -88,23 +90,27 @@ export class GraphQLQueryManager {
     where: Array<WhereExpression>,
     alias: string
   ): QueryMeta {
-    // Create a new md5 hash function
-    const hash = crypto.createHash("md5");
+    let key = "";
 
-    // Use the query parameters to generate a new hash for caching
-    const key = hash
-      .update(JSON.stringify([where, fields, alias]))
-      .digest()
-      .toString("hex");
+    if (this._cacheEnabled) {
+      // Create a new md5 hash function
+      const hash = crypto.createHash("md5");
 
-    // If this key already exists in the cache, just return the found value
-    if (this._cache.has(key)) {
-      return {
-        fields,
-        key: "",
-        item: this._cache.get(key),
-        found: true,
-      };
+      // Use the query parameters to generate a new hash for caching
+      key = hash
+        .update(JSON.stringify([where, fields, alias]))
+        .digest()
+        .toString("hex");
+
+      // If this key already exists in the cache, just return the found value
+      if (this._cache.has(key)) {
+        return {
+          fields,
+          key: "",
+          item: this._cache.get(key),
+          found: true,
+        };
+      }
     }
 
     // Cancel any scheduled immediates so we can add more
@@ -137,6 +143,10 @@ export class GraphQLQueryManager {
    * @param value
    */
   public addCacheItem<T>(key: string, value: Promise<T | undefined>) {
+    if (!this._cacheEnabled) {
+      return;
+    }
+
     this._cache.set(key, value);
   }
 
@@ -183,11 +193,12 @@ export class GraphQLQueryManager {
 
       const alias = item.alias ?? name;
 
-      let queryBuilder: SelectQueryBuilder<{}> = GraphQLQueryManager.createTypeORMQueryBuilder(
-        entityManager,
-        name,
-        alias
-      );
+      let queryBuilder: SelectQueryBuilder<{}> =
+        GraphQLQueryManager.createTypeORMQueryBuilder(
+          entityManager,
+          name,
+          alias
+        );
       queryBuilder = this._resolver.createQuery(
         name,
         item.fields,
@@ -252,15 +263,13 @@ export class GraphQLQueryManager {
     const initialWhere = conditions.shift();
     if (!initialWhere) return qb;
 
-    const { where, params } = GraphQLQueryManager._breakDownWhereExpression(
-      initialWhere
-    );
+    const { where, params } =
+      GraphQLQueryManager._breakDownWhereExpression(initialWhere);
     qb = qb.where(where, params);
 
     conditions.forEach((condition) => {
-      const { where, params } = GraphQLQueryManager._breakDownWhereExpression(
-        condition
-      );
+      const { where, params } =
+        GraphQLQueryManager._breakDownWhereExpression(condition);
       qb = qb.andWhere(where, params);
     });
     return qb;
@@ -278,9 +287,8 @@ export class GraphQLQueryManager {
     conditions: Array<WhereExpression>
   ): SelectQueryBuilder<{}> {
     conditions.forEach((condition) => {
-      const { where, params } = GraphQLQueryManager._breakDownWhereExpression(
-        condition
-      );
+      const { where, params } =
+        GraphQLQueryManager._breakDownWhereExpression(condition);
       qb = qb.orWhere(where, params);
     });
     return qb;
