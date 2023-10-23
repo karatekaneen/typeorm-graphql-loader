@@ -1,5 +1,5 @@
 {
-  "name": "@ergo-graphql/typeorm-graphql-loader",
+  "name": "@minso_minso/typeorm-graphql-loader",
   "version": "1.7.5",
   "description": "A dataloader which intelligently selects/joins the fields/relations from your TypeORM entities needed to resolve a GraphQL query",
   "main": "dist/index.js",
@@ -23,7 +23,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/capt-nemo429/typeorm-graphql-loader"
+    "url": "https://github.com/karatekaneen/typeorm-graphql-loader"
   },
   "keywords": [
     "typeorm",
@@ -41,7 +41,7 @@
   "author": "Bryan Muller",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/capt-nemo429/typeorm-graphql-loader/issues"
+    "url": "https://github.com/karatekaneen/typeorm-graphql-loader/issues"
   },
   "homepage": "https://gql-loader.bmuller.net",
   "dependencies": {
